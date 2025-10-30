@@ -24,6 +24,14 @@ export class GildedRose {
     return this.items;
   }
 
+  private increaseQuality(item: Item, amount: number = 1): void {
+    item.quality = Math.min(50, item.quality + amount);
+  }
+
+  private decreaseQuality(item: Item, amount: number = 1): void {
+    item.quality = Math.max(0, item.quality - amount);
+  }
+
   private updateItem(item: Item): void {
     switch (item.name) {
       case 'Aged Brie':
@@ -42,24 +50,20 @@ export class GildedRose {
   }
 
   private updateAgedBrie(item: Item): void {
-    if (item.quality < 50) {
-      item.quality += 1;
-    }
+    this.increaseQuality(item);
     item.sellIn -= 1;
-    if (item.sellIn < 0 && item.quality < 50) {
-      item.quality += 1;
+    if (item.sellIn < 0) {
+      this.increaseQuality(item);
     }
   }
 
   private updateBackstagePass(item: Item): void {
-    if (item.quality < 50) {
-      item.quality += 1;
-      if (item.sellIn < 11 && item.quality < 50) {
-        item.quality += 1;
-      }
-      if (item.sellIn < 6 && item.quality < 50) {
-        item.quality += 1;
-      }
+    this.increaseQuality(item);
+    if (item.sellIn < 11) {
+      this.increaseQuality(item);
+    }
+    if (item.sellIn < 6) {
+      this.increaseQuality(item);
     }
     item.sellIn -= 1;
     if (item.sellIn < 0) {
@@ -68,12 +72,10 @@ export class GildedRose {
   }
 
   private updateNormalItem(item: Item): void {
-    if (item.quality > 0) {
-      item.quality -= 1;
-    }
+    this.decreaseQuality(item);
     item.sellIn -= 1;
     if (item.sellIn < 0 && item.quality > 0) {
-      item.quality -= 1;
+      this.decreaseQuality(item);
     }
   }
 
