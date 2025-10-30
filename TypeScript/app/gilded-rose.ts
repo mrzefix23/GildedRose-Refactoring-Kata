@@ -10,6 +10,11 @@ export class Item {
   }
 }
 
+const MAX_QUALITY = 50;
+const MIN_QUALITY = 0;
+const BACKSTAGE_PASS_THRESHOLD_HIGH = 10;
+const BACKSTAGE_PASS_THRESHOLD_LOW = 5;
+
 export class GildedRose {
   items: Item[];
 
@@ -25,11 +30,11 @@ export class GildedRose {
   }
 
   private increaseQuality(item: Item, amount: number = 1): void {
-    item.quality = Math.min(50, item.quality + amount);
+    item.quality = Math.min(MAX_QUALITY, item.quality + amount);
   }
 
   private decreaseQuality(item: Item, amount: number = 1): void {
-    item.quality = Math.max(0, item.quality - amount);
+    item.quality = Math.max(MIN_QUALITY, item.quality - amount);
   }
 
   private updateItem(item: Item): void {
@@ -58,25 +63,24 @@ export class GildedRose {
   }
 
   private updateBackstagePass(item: Item): void {
-    this.increaseQuality(item);
-    if (item.sellIn < 11) {
-      this.increaseQuality(item);
+    if (item.sellIn > BACKSTAGE_PASS_THRESHOLD_HIGH) {
+      this.increaseQuality(item, 1);
+    } else if (item.sellIn > BACKSTAGE_PASS_THRESHOLD_LOW) {
+      this.increaseQuality(item, 2);
+    } else if (item.sellIn > 0) {
+      this.increaseQuality(item, 3);
+    } else {
+      item.quality = MIN_QUALITY;
     }
-    if (item.sellIn < 6) {
-      this.increaseQuality(item);
-    }
+
     item.sellIn -= 1;
-    if (item.sellIn < 0) {
-      item.quality = 0;
-    }
   }
 
   private updateNormalItem(item: Item): void {
     this.decreaseQuality(item);
     item.sellIn -= 1;
-    if (item.sellIn < 0 && item.quality > 0) {
+    if (item.sellIn < 0) {
       this.decreaseQuality(item);
     }
   }
-
 }
