@@ -18,49 +18,63 @@ export class GildedRose {
   }
 
   updateQuality(): Item[] {
-    for (let i = 0; i < this.items.length; i++) {
-      const item = this.items[i];
-
-      if (item.name !== 'Aged Brie' && item.name !== 'Backstage passes to a TAFKAL80ETC concert') {
-        if (item.quality > 0 && item.name !== 'Sulfuras, Hand of Ragnaros') {
-          item.quality -= 1;
-        }
-      } else {
-        if (item.quality < 50) {
-          item.quality += 1;
-
-          if (item.name === 'Backstage passes to a TAFKAL80ETC concert') {
-            if (item.sellIn < 11 && item.quality < 50) {
-              item.quality += 1;
-            }
-            if (item.sellIn < 6 && item.quality < 50) {
-              item.quality += 1;
-            }
-          }
-        }
-      }
-
-      if (item.name !== 'Sulfuras, Hand of Ragnaros') {
-        item.sellIn -= 1;
-      }
-
-      if (item.sellIn < 0) {
-        if (item.name !== 'Aged Brie') {
-          if (item.name !== 'Backstage passes to a TAFKAL80ETC concert') {
-            if (item.quality > 0 && item.name !== 'Sulfuras, Hand of Ragnaros') {
-              item.quality -= 1;
-            }
-          } else {
-            item.quality = 0;
-          }
-        } else {
-          if (item.quality < 50) {
-            item.quality += 1;
-          }
-        }
-      }
+    for (const item of this.items) {
+      this.updateItem(item);
     }
-
     return this.items;
   }
+
+  private updateItem(item: Item): void {
+    switch (item.name) {
+      case 'Aged Brie':
+        this.updateAgedBrie(item);
+        break;
+      case 'Backstage passes to a TAFKAL80ETC concert':
+        this.updateBackstagePass(item);
+        break;
+      case 'Sulfuras, Hand of Ragnaros':
+        // nothing to do
+        break;
+      default:
+        this.updateNormalItem(item);
+        break;
+    }
+  }
+
+  private updateAgedBrie(item: Item): void {
+    if (item.quality < 50) {
+      item.quality += 1;
+    }
+    item.sellIn -= 1;
+    if (item.sellIn < 0 && item.quality < 50) {
+      item.quality += 1;
+    }
+  }
+
+  private updateBackstagePass(item: Item): void {
+    if (item.quality < 50) {
+      item.quality += 1;
+      if (item.sellIn < 11 && item.quality < 50) {
+        item.quality += 1;
+      }
+      if (item.sellIn < 6 && item.quality < 50) {
+        item.quality += 1;
+      }
+    }
+    item.sellIn -= 1;
+    if (item.sellIn < 0) {
+      item.quality = 0;
+    }
+  }
+
+  private updateNormalItem(item: Item): void {
+    if (item.quality > 0) {
+      item.quality -= 1;
+    }
+    item.sellIn -= 1;
+    if (item.sellIn < 0 && item.quality > 0) {
+      item.quality -= 1;
+    }
+  }
+
 }
